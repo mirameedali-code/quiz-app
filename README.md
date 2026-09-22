@@ -18,8 +18,26 @@ A command-line quiz application built with Python, SQLite, and pandas — combin
 2. Run all cells
 3. The demonstration section shows adding a question, checking an answer, saving a score, and viewing stats
 
-## Example Output
-What is the capital of France?
-True
-Average score: 80.0
-Best score: 80.0
+## 🎯 Live Quiz & Scoring Output
+
+Here is what a standard user session looks like during an evaluation round:
+
+```text
+Question 1: What is the capital of France?
+  [A] Berlin
+  [B] Madrid
+  [C] Paris
+  [D] Rome
+
+👉 Your Answer: C
+✨ Result: Correct!
+
+======================================
+        HISTORICAL STATISTICS         
+======================================
+ 🏆 Personal Best:  80.0%
+ 📈 Average Score:  80.0%
+--------------------------------------
+*Score successfully synchronized to SQLite database.*
+======================================
+```
