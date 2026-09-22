@@ -18,26 +18,15 @@ A command-line quiz application built with Python, SQLite, and pandas — combin
 2. Run all cells
 3. The demonstration section shows adding a question, checking an answer, saving a score, and viewing stats
 
-## 🎯 Live Quiz & Scoring Output
+## 🕹️ Quiz Engine Interface
 
-Here is what a standard user session looks like during an evaluation round:
+Run the application to start the interactive evaluation platform or review your scores:
 
 ```text
-Question 1: What is the capital of France?
-  [A] Berlin
-  [B] Madrid
-  [C] Paris
-  [D] Rome
+=== INTERACTIVE QUIZ MENU ===
+1. Take the Quiz
+2. View History and Performance Metrics
+3. Exit
 
-👉 Your Answer: C
-✨ Result: Correct!
-
-======================================
-        HISTORICAL STATISTICS         
-======================================
- 🏆 Personal Best:  80.0%
- 📈 Average Score:  80.0%
---------------------------------------
-*Score successfully synchronized to SQLite database.*
-======================================
+Choose an option (1-3): 
 ```
