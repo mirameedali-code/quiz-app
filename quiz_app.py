@@ -1,39 +1,107 @@
 import sqlite3
-import pandas as pd
 from datetime import datetime
+import matplotlib.pyplot as plt
+import pandas as pd
 
-# --- Classes ---
+# Connect to the database
+conn = sqlite3.connect("expensedb")
+cursor = conn.cursor()
 
-class question:
-    def __init__(self, question, choices, correct_answer):
-        self.question = question
-        self.choices = choices
-        self.correct_answer = correct_answer
+# Create the table if it doesn't exist
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS expense(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    date TEXT,
+    category TEXT,
+    amount REAL
+)
+''')
+conn.commit()
 
-    def __str__(self):
-        return self.question
+def add_expense(category, amount):
+    category = category.title()
+    date = datetime.now().strftime("%Y-%m-%d")
+    cursor.execute("INSERT INTO expense (date, category, amount) VALUES (?, ?, ?)", (date, category, amount))
+    conn.commit()
+    print(f"✅ Logged Rs.{amount} for {category}")
 
-    def check_answer(self, user_answer):
-        if user_answer == self.correct_answer:
-            return True
-        else:
-            return False
+def delete_expense(expense_id):
+    cursor.execute("DELETE FROM expense WHERE id = ?", (expense_id,))
+    conn.commit()
+    print(f"🗑️ Deleted expense ID {expense_id}")
 
+def view_expense():
+    cursor.execute("SELECT * FROM expense")
+    rows = cursor.fetchall()
+    print("\n---- ALL EXPENSES ----")
+    for row in rows:
+        print(f"ID: {row[0]} - Date: {row[1]} - Category: {row[2]} - Rs.{row[3]}")
 
-class quiz:
-    def __init__(self):
-        self.questions = []
+def total_spent():
+    cursor.execute("SELECT SUM(amount) FROM expense")
+    total = cursor.fetchone()[0]
+    if total is None:
+        total = 0
+    print(f"\n💰 Total spent so far: Rs.{total}")
 
-    def add_question(self, new_question):
-        self.questions.append(new_question)
+def filter_by_category(category):
+    category = category.title()
+    cursor.execute("SELECT * FROM expense WHERE category = ?", (category,))
+    rows = cursor.fetchall()
+    print(f"\n---- EXPENSES FOR {category} ----")
+    for row in rows:
+        print(f"ID: {row[0]} - Date: {row[1]} - Rs.{row[3]}")
 
-    def display_questions(self):
-        for q in self.questions:
-            print(q)
+def show_chart():
+    df = pd.read_sql_query("SELECT * FROM expense", conn)
+    if df.empty:
+        print("⚠️ No data to make a chart yet!")
+        return
+    
+    df["category"] = df["category"].str.title()
+    print("\n Spending grouped by category:")
+    print(df.groupby("category")["amount"].sum())
+    
+    # Pop up the simple bar chart
+    df.groupby("category")["amount"].sum().plot(kind="bar")
+    plt.title("My Spending")
+    plt.tight_layout()
+    plt.show()
 
-
-# --- Database setup ---
-
+# --- THE INTERACTIVE MENU LOOP ---
+while True:
+    print("\n=== EXPENSE TRACKER MENU ===")
+    print("1. Add a New Expense")
+    print("2. View All Expenses")
+    print("3. View Total Spent")
+    print("4. Filter Expenses by Category")
+    print("5. Delete an Expense by ID")
+    print("6. Show Analytics Chart")
+    print("7. Exit")
+    
+    choice = input("\nChoose an option (1-7): ").strip()
+    
+    if choice == "1":
+        cat = input("Enter category (e.g. Food, Transport): ").strip()
+        amt = float(input("Enter amount (Rs.): "))
+        add_expense(cat, amt)
+    elif choice == "2":
+        view_expense()
+    elif choice == "3":
+        total_spent()
+    elif choice == "4":
+        cat = input("Enter category to search: ").strip()
+        filter_by_category(cat)
+    elif choice == "5":
+        exp_id = int(input("Enter the Expense ID to delete: "))
+        delete_expense(exp_id)
+    elif choice == "6":
+        show_chart()
+    elif choice == "7":
+        print("Goodbye!")
+        break
+    else:
+        print("❌ Invalid option. Please choose 1 to 7.")
 conn = sqlite3.connect("quiz.db")
 cursor = conn.cursor()
 
